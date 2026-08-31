@@ -1,0 +1,62 @@
+[
+  {
+    "id": "pandal_khairatabad",
+    "name": "ఖైరతాబాద్ మహా గణపతి (Khairatabad Maha Ganapathi)",
+    "address": "Khairatabad Market Road, Hyderabad, Telangana 500004",
+    "lat": 17.4116,
+    "lng": 78.4619,
+    "type": "pandal",
+    "idolHeight": "65 Feet Clay Idol (Eco-Friendly)",
+    "specialAttraction": "భారీ లడ్డూ ప్రసాదం & పంచముఖ దివ్య శైలి అలంకరణ",
+    "contact": "+91 98480 12345",
+    "imageUrl": "assets/images/pandals/khairatabad.png"
+  },
+  {
+    "id": "pandal_balapur",
+    "name": "బాలాపూర్ గణేష్ ఉత్సవ సమితి (Balapur Ganesh)",
+    "address": "Balapur Village, Old City, Hyderabad 500005",
+    "lat": 17.3197,
+    "lng": 78.5085,
+    "type": "pandal",
+    "idolHeight": "21 Feet Traditional Form",
+    "specialAttraction": "చారిత్రాత్మక బాలాపూర్ లడ్డూ వేలంపాట & శోభాయాత్ర రథం",
+    "contact": "+91 94400 54321",
+    "imageUrl": "assets/images/pandals/balapur.png"
+  },
+  {
+    "id": "pandal_secunderabad",
+    "name": "సికింద్రాబాద్ మహాంకాళి ఆలయ గణపతి",
+    "address": "General Bazar, Secunderabad 500003",
+    "lat": 17.4411,
+    "lng": 78.4983,
+    "type": "pandal",
+    "idolHeight": "30 Feet Ayodhya Mandir Backdrop",
+    "specialAttraction": "ప్రత్యేక పుష్పాలంకరణ & అన్నదాన ప్రసాదం",
+    "contact": "+91 99887 11223",
+    "imageUrl": "assets/images/pandals/secunderabad.png"
+  },
+  {
+    "id": "immersion_hussain_sagar",
+    "name": "హుస్సేన్ సాగర్ ప్రధాన నిమజ్జన ఘాట్ (Hussain Sagar VIP Ghat)",
+    "address": "NTR Marg & Tank Bund Road, Hyderabad",
+    "lat": 17.4239,
+    "lng": 78.4738,
+    "type": "immersion",
+    "idolHeight": "All Sizes Heavy Cranes Support",
+    "specialAttraction": "క్రేన్ నంబర్లు 1 నుండి 9, నిరంతర రవాణా & ట్రాఫిక్ గైడెన్స్",
+    "contact": "GHMC Helpline: 040-21111111",
+    "imageUrl": "assets/images/pandals/hussain_sagar.png"
+  },
+  {
+    "id": "immersion_durgam_cheruvu",
+    "name": "దుర్గం చెరువు బేబీ పాండ్ (Durgam Cheruvu Eco-Immersion)",
+    "address": "Near Inorbit Mall, Madhapur, Hitec City, Hyderabad",
+    "lat": 17.4332,
+    "lng": 78.3867,
+    "type": "immersion",
+    "idolHeight": "Clay idols up to 10 Feet",
+    "specialAttraction": "పర్యావరణ హిత ప్రత్యేక కృత్రిమ పాండ్",
+    "contact": "GHMC West Zone: 040-23326111",
+    "imageUrl": "assets/images/pandals/durgam_cheruvu.png"
+  }
+]

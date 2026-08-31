@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if the user is an admin
+    function isAdmin() {
+      return request.auth != null && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Public read access for devotional content, write access restricted to admins
+    match /harathis/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /pooja_steps/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /pathri/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /recipes/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /vratha_katha/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /pandals/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Admins collection - strictly read/write by admins only
+    match /admins/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false; // Configured directly from Firebase Console
+    }
+
+    // Notifications trigger queue
+    match /notifications/{docId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false;
+    }
+  }
+}

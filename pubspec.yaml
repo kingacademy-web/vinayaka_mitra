@@ -1,0 +1,59 @@
+name: vinayaka_mitra
+description: A complete devotional companion app for Vinayaka Chavithi and Hindu festivals in Telugu & English.
+version: 1.0.0+1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.15.3
+  cloud_firestore: ^4.13.6
+  firebase_storage: ^11.5.6
+  firebase_crashlytics: ^3.4.9
+  firebase_messaging: ^14.7.10
+  
+  # State & Local Storage
+  provider: ^6.1.1
+  hive_flutter: ^1.1.0
+  shared_preferences: ^2.2.2
+  
+  # UI & Media
+  google_fonts: ^6.1.0
+  cached_network_image: ^3.3.1
+  flutter_svg: ^2.0.9
+  shimmer: ^3.0.0
+  
+  # Geolocation & Maps
+  google_maps_flutter: ^2.5.3
+  geolocator: ^10.1.0
+  
+  # Utilities
+  connectivity_plus: ^5.0.2
+  intl: ^0.19.0
+  share_plus: ^7.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/seed/
+    - assets/images/
+    - assets/images/pathri/
+
+  fonts:
+    - family: NotoSansTelugu
+      fonts:
+        - asset: assets/fonts/NotoSansTelugu-Regular.ttf
+        - asset: assets/fonts/NotoSansTelugu-Bold.ttf
+          weight: 700
