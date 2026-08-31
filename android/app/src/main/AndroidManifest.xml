@@ -12,7 +12,7 @@
     <application
         android:label="వినాయక మిత్ర"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:enableOnBackInvokedCallback="true">
 
         <activity
