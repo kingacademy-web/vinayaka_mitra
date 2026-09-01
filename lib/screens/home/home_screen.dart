@@ -258,8 +258,8 @@ class HomeScreen extends StatelessWidget {
                     onTap: () => _push(context, const PrasadamScreen()),
                   ),
                   QuickButton(
-                    icon: Icons.map_outlined,
-                    label: 'పందల్ మ్యాప్',
+                    icon: Icons.location_on_outlined,
+                    label: 'పందల్ & ఘాట్‌లు',
                     iconColor: const Color(0xFF1976D2),
                     onTap: () => _push(context, const PandalMapScreen()),
                   ),
