@@ -35,7 +35,7 @@ class _PandalMapScreenState extends State<PandalMapScreen> {
         await Geolocator.requestPermission();
       }
       final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
       ).timeout(const Duration(seconds: 4));
       _center = LatLng(pos.latitude, pos.longitude);
       _mapController?.animateCamera(CameraUpdate.newLatLngZoom(_center, 13));
