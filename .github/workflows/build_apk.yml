@@ -29,8 +29,11 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
+      - name: Analyze Project Code
+        run: flutter analyze
+
       - name: Build Android Release APK
-        run: flutter build apk --release --no-tree-shake-icons
+        run: flutter build apk --release --no-tree-shake-icons --verbose
 
       - name: Upload Release APK Artifact
         uses: actions/upload-artifact@v4

@@ -148,8 +148,8 @@ class AppTheme {
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: isDark ? AppColors.darkSurface : AppColors.white,
         indicatorColor: AppColors.saffron.withOpacity(0.25),
-        labelTextStyle: MaterialStateProperty.resolveWith((states) {
-          final isSelected = states.contains(MaterialState.selected);
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final isSelected = states.contains(WidgetState.selected);
           return TextStyle(
             fontFamily: 'NotoSansTelugu',
             fontSize: 12,

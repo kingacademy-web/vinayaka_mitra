@@ -146,7 +146,7 @@ class _PandalMapScreenState extends State<PandalMapScreen> {
                   child: _filteredPandals.isEmpty
                       ? Center(
                           child: Column(
-                            mainAxisAlignment: MainTestThemeCenter(),
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.location_off_outlined, size: 64, color: Colors.grey.shade400),
                               const SizedBox(height: 12),
@@ -175,8 +175,6 @@ class _PandalMapScreenState extends State<PandalMapScreen> {
             ),
     );
   }
-
-  MainAxisAlignment MainTestThemeCenter() => MainAxisAlignment.center;
 
   Widget _buildFilterChip(String label, String type) {
     final isSelected = _selectedFilter == type;
@@ -331,24 +329,29 @@ class _PandalMapScreenState extends State<PandalMapScreen> {
                 ),
                 const SizedBox(width: 8),
                 if (p.contact != null && p.contact!.isNotEmpty) ...[
-                  IconButton.filledTonal(
-                    tooltip: 'కాల్ చేయండి',
-                    style: IconButton.styleFrom(
-                      backgroundColor: AppColors.greenAuspicious.withOpacity(0.15),
-                      foregroundColor: AppColors.greenAuspicious,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.greenAuspicious.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    icon: const Icon(Icons.phone, size: 20),
-                    onPressed: () => _callContact(p.contact!),
+                    child: IconButton(
+                      tooltip: 'కాల్ చేయండి',
+                      icon: const Icon(Icons.phone, size: 20, color: AppColors.greenAuspicious),
+                      onPressed: () => _callContact(p.contact!),
+                    ),
                   ),
                   const SizedBox(width: 6),
                 ],
-                IconButton.filledTonal(
-                  tooltip: 'షేర్ చేయండి',
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.grey.withOpacity(0.15),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  icon: const Icon(Icons.share, size: 20),
-                  onPressed: () => _sharePandal(p),
+                  child: IconButton(
+                    tooltip: 'షేర్ చేయండి',
+                    icon: const Icon(Icons.share, size: 20),
+                    onPressed: () => _sharePandal(p),
+                  ),
                 ),
               ],
             ),
