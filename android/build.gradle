@@ -1,7 +1,23 @@
+buildscript {
+    ext.kotlin_version = '1.9.24'
+    ext.compileSdkVersion = 34
+    ext.targetSdkVersion = 34
+    ext.minSdkVersion = 23
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
 allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+    project.ext {
+        set('compileSdkVersion', 34)
+        set('targetSdkVersion', 34)
+        set('minSdkVersion', 23)
     }
 }
 
