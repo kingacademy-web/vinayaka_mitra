@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../core/constants/app_colors.dart';
@@ -110,44 +111,89 @@ ${h.meaning}
             ),
       body: GestureDetector(
         onTap: _isFullscreen ? () => setState(() => _isFullscreen = false) : null,
-        child: Stack(
+        child: Column(
           children: [
-            TabBarView(
-              controller: _tabController,
-              children: [
-                _ReaderBody(
-                  text: h.lyricsTelugu,
-                  fontSize: provider.fontSize,
-                ),
-                _ReaderBody(
-                  text: h.lyricsEnglish,
-                  fontSize: provider.fontSize,
-                ),
-                _ReaderBody(
-                  text: h.meaning,
-                  fontSize: provider.fontSize,
-                  isMeaning: true,
-                ),
-              ],
-            ),
-            if (_isFullscreen)
-              Positioned(
-                top: 16,
-                right: 16,
-                child: SafeArea(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: (isDark ? Colors.black : Colors.white).withOpacity(0.85),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.goldBorder),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.fullscreen_exit),
-                      onPressed: () => setState(() => _isFullscreen = false),
-                    ),
+            // PDF Banner if attached
+            if (h.pdfPath != null && h.pdfPath!.isNotEmpty)
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.saffron,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 2,
                   ),
+                  icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+                  label: const Text(
+                    '📄 పూర్తి PDF తెరవండి (Open PDF Document)',
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                  ),
+                  onPressed: () async {
+                    try {
+                      await OpenFilex.open(h.pdfPath!);
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('PDF తెరవడం వీలుపడలేదు: $e')),
+                        );
+                      }
+                    }
+                  },
                 ),
               ),
+
+            // Lyrics & Meaning Tabs
+            Expanded(
+              child: Stack(
+                children: [
+                  TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _ReaderBody(
+                        text: h.lyricsTelugu.isNotEmpty
+                            ? h.lyricsTelugu
+                            : 'ఈ హారతికి లిరిక్స్ లేవు. పైన ఉన్న PDF బటన్ నొక్కి పూర్తి పత్రం చదవండి.',
+                        fontSize: provider.fontSize,
+                      ),
+                      _ReaderBody(
+                        text: h.lyricsEnglish.isNotEmpty
+                            ? h.lyricsEnglish
+                            : 'No English lyrics available. Please open the attached PDF above.',
+                        fontSize: provider.fontSize,
+                      ),
+                      _ReaderBody(
+                        text: h.meaning.isNotEmpty
+                            ? h.meaning
+                            : 'స్వామివారి దివ్య మంగళ హారతి.',
+                        fontSize: provider.fontSize,
+                        isMeaning: true,
+                      ),
+                    ],
+                  ),
+                  if (_isFullscreen)
+                    Positioned(
+                      top: 16,
+                      right: 16,
+                      child: SafeArea(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: (isDark ? Colors.black : Colors.white).withOpacity(0.85),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.goldBorder),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.fullscreen_exit),
+                            onPressed: () => setState(() => _isFullscreen = false),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -172,7 +218,7 @@ class _ReaderBody extends StatelessWidget {
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       child: Center(
         child: SelectableText(
           text,

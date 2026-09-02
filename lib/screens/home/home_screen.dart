@@ -3,13 +3,16 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/date_utils.dart';
 import '../../providers/harathi_provider.dart';
+import '../../providers/language_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../widgets/quick_button.dart';
 import '../../widgets/section_header.dart';
 import '../admin/admin_panel.dart';
-import '../harathulu/library_screen.dart';
 import '../favorites/favorites_screen.dart';
+import '../harathulu/library_screen.dart';
 import '../harathulu/reader_screen.dart';
+import '../mandali/mandali_hub_screen.dart';
+import '../onboarding/language_selection_screen.dart';
 import '../pathri/pathri_screen.dart';
 import '../pooja/pooja_vidhanam_screen.dart';
 import '../prasadam/prasadam_screen.dart';
@@ -27,6 +30,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.watch<LanguageProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final panchangam = DevotionalDateUtils.getTodaysPanchangam();
     final daysLeft = DevotionalDateUtils.getDaysUntilGaneshChaturthi();
@@ -45,7 +49,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   const Text('🪔 ', style: TextStyle(fontSize: 22)),
                   Text(
-                    'వినాయక మిత్ర',
+                    lang.t('appName'),
                     style: TextStyle(
                       fontFamily: 'NotoSansTelugu',
                       fontWeight: FontWeight.w800,
@@ -55,6 +59,29 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
               actions: [
+                // Language Switcher Button
+                TextButton.icon(
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    backgroundColor: isDark ? AppColors.darkSurfaceElevated : AppColors.goldSoft,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  icon: const Icon(Icons.language, size: 16, color: AppColors.saffron),
+                  label: Text(
+                    lang.currentLanguage == 'te'
+                        ? 'తెలుగు'
+                        : lang.currentLanguage == 'hi'
+                            ? 'हिन्दी'
+                            : 'EN',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: isDark ? AppColors.royalGold : AppColors.deepGold,
+                    ),
+                  ),
+                  onPressed: () => _push(context, const LanguageSelectionScreen(isFromSettings: true)),
+                ),
+                const SizedBox(width: 6),
                 IconButton(
                   tooltip: 'Admin Panel',
                   icon: const Icon(Icons.admin_panel_settings_outlined),
@@ -65,6 +92,7 @@ class HomeScreen extends StatelessWidget {
                   icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode_outlined),
                   onPressed: () => context.read<ThemeProvider>().toggle(),
                 ),
+                const SizedBox(width: 8),
               ],
             ),
 
@@ -106,40 +134,55 @@ class HomeScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Text(
-                                'శ్రీ గణేశ చతుర్థి శుభాకాంక్షలు',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 12,
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    lang.currentLanguage == 'hi'
+                                        ? '🌺 श्री गणेश चतुर्थी महोत्सव 🌺'
+                                        : lang.currentLanguage == 'en'
+                                            ? '🌺 Sri Ganesh Chaturthi Festival 🌺'
+                                            : '🌺 శ్రీ వినాయక చవితి మహోత్సవం 🌺',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                            const SizedBox(height: 10),
-                            const Text(
-                              'ఓం శ్రీ మహాగణాధిపతయే నమః',
-                              style: TextStyle(
+                            const SizedBox(height: 12),
+                            Text(
+                              daysLeft == 0
+                                  ? (lang.currentLanguage == 'hi'
+                                      ? '🎉 आज श्री विनायक चतुर्थी है!'
+                                      : lang.currentLanguage == 'en'
+                                          ? '🎉 Today is Vinayaka Chavithi!'
+                                          : '🎉 నేడే శ్రీ వినాయక చవితి!')
+                                  : (lang.currentLanguage == 'hi'
+                                      ? 'उत्सव प्रारंभ में केवल $daysLeft दिन शेष'
+                                      : lang.currentLanguage == 'en'
+                                          ? 'Only $daysLeft Days left for Festival'
+                                          : 'మహోత్సవానికి ఇంకా $daysLeft రోజులు మాత్రమే'),
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800,
-                                letterSpacing: 0.3,
+                                height: 1.3,
                               ),
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              daysLeft == 0
-                                  ? '🎉 నేడే పవిత్ర వినాయక చవితి పండుగ!'
-                                  : 'వినాయక చవితికి ఇంకా $daysLeft రోజుల సమయం కలదు',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.95),
+                              lang.t('appTagline'),
+                              style: const TextStyle(
+                                color: Colors.white70,
                                 fontSize: 13,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
@@ -151,33 +194,30 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            // Daily Panchangam Summary Card
+            // Panchangam Widget
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: Card(
                   child: Padding(
                     padding: const EdgeInsets.all(14),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
                             const Icon(Icons.wb_sunny_outlined, size: 18, color: AppColors.saffron),
                             const SizedBox(width: 8),
                             Text(
-                              'నేటి పంచాంగం & ముహూర్తం',
+                              lang.currentLanguage == 'hi'
+                                  ? 'दैनिक पंचांग (${panchangam.dateFormatted})'
+                                  : lang.currentLanguage == 'en'
+                                      ? 'Daily Panchangam (${panchangam.dateFormatted})'
+                                      : 'నేటి పంచాంగం (${panchangam.dateFormatted})',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 14,
                                 color: isDark ? AppColors.royalGold : AppColors.deepGold,
-                              ),
-                            ),
-                            const Spacer(),
-                            Text(
-                              DevotionalDateUtils.formatTeluguDate(DateTime.now()),
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: isDark ? AppColors.darkTextSecondary : Colors.grey.shade700,
                               ),
                             ),
                           ],
@@ -187,17 +227,16 @@ class HomeScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _PanchangamItem(
-                              label: 'తిథి',
-                              value: panchangam['tithi']!,
+                              title: lang.currentLanguage == 'hi' ? 'तिथि' : lang.currentLanguage == 'en' ? 'Tithi' : 'తిథి',
+                              value: panchangam.tithi,
                             ),
                             _PanchangamItem(
-                              label: 'నక్షత్రం',
-                              value: panchangam['nakshatram']!,
+                              title: lang.currentLanguage == 'hi' ? 'नक्षत्र' : lang.currentLanguage == 'en' ? 'Nakshatra' : 'నక్షత్రం',
+                              value: panchangam.nakshatram,
                             ),
                             _PanchangamItem(
-                              label: 'అభిజిత్ ముహూర్తం',
-                              value: panchangam['muhurtham']!,
-                              highlight: true,
+                              title: lang.currentLanguage == 'hi' ? 'अभिजीत मुहूर्त' : lang.currentLanguage == 'en' ? 'Muhurtham' : 'ముహూర్తం',
+                              value: panchangam.abhijitMuhurtham,
                             ),
                           ],
                         ),
@@ -208,17 +247,79 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            // Section: Devotional Features
-            const SliverToBoxAdapter(
-              child: SectionHeader(
-                title: 'పూజా సేవా విభాగాలు',
-                subtitle: 'సమగ్ర భక్తి సంకలనం మరియు పూజా సామగ్రి',
+            // Mitra Mandali & Association Banner Entry
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+                child: InkWell(
+                  onTap: () => _push(context, const MandaliHubScreen()),
+                  borderRadius: BorderRadius.circular(18),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFB71C1C), Color(0xFFE65100)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFE65100).withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Text('🚩', style: TextStyle(fontSize: 26)),
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                lang.t('mandaliTitle'),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                lang.t('mandaliSubtitle'),
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
 
             // Quick Actions Grid
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               sliver: SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
@@ -229,37 +330,37 @@ class HomeScreen extends StatelessWidget {
                 delegate: SliverChildListDelegate([
                   QuickButton(
                     icon: Icons.menu_book,
-                    label: 'పూజా విధానం',
+                    label: lang.t('poojaVidhanam'),
                     iconColor: AppColors.deepGold,
                     onTap: () => _push(context, const PoojaVidhanamScreen()),
                   ),
                   QuickButton(
                     icon: Icons.local_fire_department,
-                    label: 'హారతులు',
+                    label: lang.t('harathulu'),
                     iconColor: AppColors.saffron,
                     onTap: () => _push(context, const LibraryScreen()),
                   ),
                   QuickButton(
                     icon: Icons.auto_stories,
-                    label: 'వ్రత కథ',
+                    label: lang.t('vrathaKatha'),
                     iconColor: AppColors.maroon,
                     onTap: () => _push(context, const VrathaKathaScreen()),
                   ),
                   QuickButton(
                     icon: Icons.eco,
-                    label: '21 పత్రి పూజ',
+                    label: lang.t('pathriPooja'),
                     iconColor: AppColors.greenAuspicious,
                     onTap: () => _push(context, const PathriScreen()),
                   ),
                   QuickButton(
                     icon: Icons.restaurant,
-                    label: 'నైవేద్యం/ప్రసాదం',
+                    label: lang.t('prasadam'),
                     iconColor: const Color(0xFFE65100),
                     onTap: () => _push(context, const PrasadamScreen()),
                   ),
                   QuickButton(
                     icon: Icons.favorite,
-                    label: 'ఇష్టమైన హారతులు',
+                    label: lang.t('favorites'),
                     iconColor: AppColors.maroon,
                     onTap: () => _push(context, const FavoritesScreen()),
                   ),
@@ -268,10 +369,18 @@ class HomeScreen extends StatelessWidget {
             ),
 
             // Section: Featured Harathi
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: SectionHeader(
-                title: 'నిత్య మంగళ హారతి',
-                subtitle: 'భక్తితో పఠించండి',
+                title: lang.currentLanguage == 'hi'
+                    ? 'नित्य मंगल आरती'
+                    : lang.currentLanguage == 'en'
+                        ? 'Featured Harathi'
+                        : 'నిత్య మంగళ హారతి',
+                subtitle: lang.currentLanguage == 'hi'
+                    ? 'भक्ति भाव से पाठ करें'
+                    : lang.currentLanguage == 'en'
+                        ? 'Read with devotion'
+                        : 'భక్తితో పఠించండి',
               ),
             ),
 
@@ -279,63 +388,72 @@ class HomeScreen extends StatelessWidget {
             SliverToBoxAdapter(
               child: Consumer<HarathiProvider>(
                 builder: (context, provider, _) {
-                  final list = provider.allHarathis;
-                  if (list.isEmpty) return const SizedBox.shrink();
-                  final featured = list.first;
+                  if (provider.isLoading) {
+                    return const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Center(child: CircularProgressIndicator(color: AppColors.saffron)),
+                    );
+                  }
+
+                  if (provider.allHarathis.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final featured = provider.allHarathis.first;
 
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Card(
                       child: InkWell(
                         onTap: () => _push(context, ReaderScreen(harathi: featured)),
                         borderRadius: BorderRadius.circular(16),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: AppColors.goldSoft,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Icon(
-                                  Icons.auto_awesome,
-                                  color: AppColors.saffron,
-                                  size: 28,
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
+                              Row(
+                                children: [
+                                  const Icon(Icons.local_fire_department, color: AppColors.saffron, size: 22),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
                                       featured.titleTe,
+                                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16,
-                                      ),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      featured.titleEn,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: isDark
-                                            ? AppColors.darkTextSecondary
-                                            : Colors.grey.shade600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  if (featured.pdfPath != null)
+                                    const Icon(Icons.picture_as_pdf, color: AppColors.saffron, size: 20),
+                                ],
                               ),
-                              const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.deepGold),
+                              const SizedBox(height: 6),
+                              Text(
+                                featured.lyricsTelugu.split('\n').take(3).join('\n'),
+                                style: TextStyle(
+                                  fontFamily: 'NotoSansTelugu',
+                                  fontSize: 13,
+                                  height: 1.6,
+                                  color: isDark ? AppColors.darkTextSecondary : Colors.grey.shade700,
+                                ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    '${lang.t('viewAll')} ➔',
+                                    style: const TextStyle(
+                                      color: AppColors.saffron,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -345,6 +463,7 @@ class HomeScreen extends StatelessWidget {
                 },
               ),
             ),
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ),
       ),
@@ -353,40 +472,18 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _PanchangamItem extends StatelessWidget {
-  final String label;
+  final String title;
   final String value;
-  final bool highlight;
 
-  const _PanchangamItem({
-    required this.label,
-    required this.value,
-    this.highlight = false,
-  });
+  const _PanchangamItem({required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Column(
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            color: isDark ? AppColors.darkTextSecondary : Colors.grey.shade600,
-          ),
-        ),
-        const SizedBox(height: 3),
-        Text(
-          value,
-          style: TextStyle(
-            fontWeight: highlight ? FontWeight.w800 : FontWeight.w600,
-            fontSize: 12,
-            color: highlight
-                ? (isDark ? AppColors.royalGold : AppColors.maroon)
-                : (isDark ? AppColors.darkTextPrimary : Colors.black87),
-          ),
-        ),
+        Text(title, style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
       ],
     );
   }

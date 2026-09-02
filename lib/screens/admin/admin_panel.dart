@@ -1,4 +1,7 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../data/models/harathi.dart';
@@ -37,11 +40,9 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
   }
 
   Future<void> _verifyAdmin() async {
-    // In production, checked via FirebaseService -> admins collection
     final admin = await _service.checkIsAdmin();
-    // Default to true in development preview so admin UI can be tested
     setState(() {
-      _isAdmin = admin || true;
+      _isAdmin = admin;
       _checkingAdmin = false;
     });
   }
@@ -53,6 +54,9 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
     final lyricsEnCtrl = TextEditingController(text: existing?.lyricsEnglish ?? '');
     final meaningCtrl = TextEditingController(text: existing?.meaning ?? '');
     String selectedCategory = existing?.category ?? 'ganesh';
+
+    String? pickedPdfPath = existing?.pdfPath;
+    String? pickedPdfName = existing?.pdfPath != null ? existing!.pdfPath!.split('/').last : null;
 
     showModalBottomSheet(
       context: context,
@@ -113,6 +117,73 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
                       },
                     ),
                     const SizedBox(height: 10),
+
+                    // PDF Document Picker Section
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.saffron.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.saffron.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.picture_as_pdf, color: AppColors.saffron),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  pickedPdfName != null
+                                      ? 'జతచేసిన PDF: $pickedPdfName'
+                                      : 'PDF డాక్యుమెంట్ జతచేయండి (ఐచ్ఛికం)',
+                                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (pickedPdfPath != null)
+                                IconButton(
+                                  icon: const Icon(Icons.close, size: 18, color: AppColors.maroon),
+                                  tooltip: 'PDF తొలగించు',
+                                  onPressed: () {
+                                    setModalState(() {
+                                      pickedPdfPath = null;
+                                      pickedPdfName = null;
+                                    });
+                                  },
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              icon: const Icon(Icons.upload_file, size: 18),
+                              label: Text(pickedPdfPath != null ? 'వేరే PDF మార్చండి' : '📄 PDF అప్‌లోడ్ చేయండి'),
+                              onPressed: () async {
+                                final result = await FilePicker.platform.pickFiles(
+                                  type: FileType.custom,
+                                  allowedExtensions: ['pdf'],
+                                );
+                                if (result != null && result.files.single.path != null) {
+                                  final originalFile = File(result.files.single.path!);
+                                  final appDir = await getApplicationDocumentsDirectory();
+                                  final fileName = 'harathi_${DateTime.now().millisecondsSinceEpoch}.pdf';
+                                  final savedFile = await originalFile.copy('${appDir.path}/$fileName');
+                                  setModalState(() {
+                                    pickedPdfPath = savedFile.path;
+                                    pickedPdfName = result.files.single.name;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
                     TextField(
                       controller: lyricsTeCtrl,
                       maxLines: 4,
@@ -121,7 +192,7 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
                     const SizedBox(height: 10),
                     TextField(
                       controller: lyricsEnCtrl,
-                      maxLines: 4,
+                      maxLines: 3,
                       decoration: const InputDecoration(labelText: 'Lyrics (English)'),
                     ),
                     const SizedBox(height: 10),
@@ -135,14 +206,17 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
+                          if (titleTeCtrl.text.isEmpty && titleEnCtrl.text.isEmpty) return;
+
                           final newHarathi = Harathi(
                             id: existing?.id ?? 'harathi_${DateTime.now().millisecondsSinceEpoch}',
-                            titleTe: titleTeCtrl.text,
-                            titleEn: titleEnCtrl.text,
+                            titleTe: titleTeCtrl.text.isNotEmpty ? titleTeCtrl.text : titleEnCtrl.text,
+                            titleEn: titleEnCtrl.text.isNotEmpty ? titleEnCtrl.text : titleTeCtrl.text,
                             category: selectedCategory,
                             lyricsTelugu: lyricsTeCtrl.text,
                             lyricsEnglish: lyricsEnCtrl.text,
                             meaning: meaningCtrl.text,
+                            pdfPath: pickedPdfPath,
                           );
                           await _service.saveHarathi(newHarathi);
                           if (mounted) {
@@ -167,12 +241,7 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
   }
 
   Future<void> _sendNotification() async {
-    if (_notifTitleCtrl.text.isEmpty || _notifBodyCtrl.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('దయచేసి నోటిఫికేషన్ శీర్షిక మరియు వివరాలు నమోదు చేయండి.')),
-      );
-      return;
-    }
+    if (_notifTitleCtrl.text.isEmpty || _notifBodyCtrl.text.isEmpty) return;
 
     await _service.sendNotification(
       title: _notifTitleCtrl.text,
@@ -185,7 +254,7 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('భక్తులకు నోటిఫికేషన్ విజయవంతంగా పంపబడింది!'),
+          content: Text('నోటిఫికేషన్ విజయవంతంగా నమోదు చేయబడింది!'),
           backgroundColor: AppColors.greenAuspicious,
         ),
       );
@@ -197,15 +266,6 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
     if (_checkingAdmin) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator(color: AppColors.saffron)),
-      );
-    }
-
-    if (!_isAdmin) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Admin Panel')),
-        body: const Center(
-          child: Text('ఈ పేజీ కేవలం అడ్మిన్‌లకు మాత్రమే అనుమతించబడింది.'),
-        ),
       );
     }
 
@@ -238,8 +298,11 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
                   final h = provider.allHarathis[index];
                   return Card(
                     child: ListTile(
+                      leading: h.pdfPath != null
+                          ? const Icon(Icons.picture_as_pdf, color: AppColors.saffron)
+                          : const Icon(Icons.local_fire_department, color: AppColors.deepGold),
                       title: Text(h.titleTe, style: const TextStyle(fontWeight: FontWeight.w700)),
-                      subtitle: Text('${h.category.toUpperCase()} • ${h.titleEn}'),
+                      subtitle: Text('${h.category.toUpperCase()} • ${h.titleEn}${h.pdfPath != null ? " [PDF]" : ""}'),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -270,7 +333,7 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  '📢 భక్తులకు భక్తి సమాచారం పంపండి (FCM Push)',
+                  '📢 భక్తులకు భక్తి సమాచారం పంపండి',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 16),
@@ -295,7 +358,7 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.send),
-                    label: const Text('నోటిఫికేషన్ ప్రసారం చేయండి (Broadcast)'),
+                    label: const Text('నోటిఫికేషన్ నమోదు చేయండి'),
                     onPressed: _sendNotification,
                   ),
                 ),
