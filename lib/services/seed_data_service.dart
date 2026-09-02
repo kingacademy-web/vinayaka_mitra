@@ -5,7 +5,6 @@ import '../data/models/pathri.dart';
 import '../data/models/pooja_step.dart';
 import '../data/models/recipe.dart';
 import '../data/models/vratha_katha.dart';
-import '../data/models/pandal.dart';
 
 class SeedDataService {
   static final SeedDataService _instance = SeedDataService._internal();
@@ -62,17 +61,6 @@ class SeedDataService {
       final jsonStr = await rootBundle.loadString('assets/seed/vratha_katha.json');
       final list = json.decode(jsonStr) as List<dynamic>;
       return list.map((e) => KathaChapter.fromMap(e as Map<String, dynamic>)).toList();
-    } catch (e) {
-      return [];
-    }
-  }
-
-  /// Loads Pandals & Immersion ghats from assets
-  Future<List<Pandal>> loadPandals() async {
-    try {
-      final jsonStr = await rootBundle.loadString('assets/seed/pandals.json');
-      final list = json.decode(jsonStr) as List<dynamic>;
-      return list.map((e) => Pandal.fromMap(e as Map<String, dynamic>)).toList();
     } catch (e) {
       return [];
     }

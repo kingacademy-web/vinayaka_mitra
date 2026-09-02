@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../data/models/harathi.dart';
-import '../data/models/pandal.dart';
 import '../data/models/pathri.dart';
 import '../data/models/pooja_step.dart';
 import '../data/models/recipe.dart';
@@ -140,20 +139,6 @@ class FirebaseService {
       }
     } catch (_) {}
     return _seed.loadVrathaKatha();
-  }
-
-  /// Fetch Pandals & Immersion spots
-  Future<List<Pandal>> getPandals() async {
-    try {
-      final snap = await FirebaseFirestore.instance
-          .collection('pandals')
-          .get(const GetOptions(source: Source.serverAndCache))
-          .timeout(const Duration(seconds: 4));
-      if (snap.docs.isNotEmpty) {
-        return snap.docs.map((d) => Pandal.fromMap(d.data(), d.id)).toList();
-      }
-    } catch (_) {}
-    return _seed.loadPandals();
   }
 
   /// Admin write operation: Save or Update a Harathi

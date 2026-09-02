@@ -13,6 +13,7 @@ class AppColors {
 
   // Surface & Accent Colors (Light)
   static const Color goldSoft = Color(0xFFFFF1D0);
+  static const Color softGold = goldSoft;
   static const Color goldBorder = Color(0xFFE6C860);
   static const Color saffronLight = Color(0xFFFFF3E0);
   static const Color greenAuspicious = Color(0xFF2E7D32);

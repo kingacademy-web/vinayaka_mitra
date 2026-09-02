@@ -8,8 +8,8 @@ import '../../widgets/quick_button.dart';
 import '../../widgets/section_header.dart';
 import '../admin/admin_panel.dart';
 import '../harathulu/library_screen.dart';
+import '../favorites/favorites_screen.dart';
 import '../harathulu/reader_screen.dart';
-import '../map/pandal_map_screen.dart';
 import '../pathri/pathri_screen.dart';
 import '../pooja/pooja_vidhanam_screen.dart';
 import '../prasadam/prasadam_screen.dart';
@@ -258,10 +258,10 @@ class HomeScreen extends StatelessWidget {
                     onTap: () => _push(context, const PrasadamScreen()),
                   ),
                   QuickButton(
-                    icon: Icons.location_on_outlined,
-                    label: 'పందల్ & ఘాట్‌లు',
-                    iconColor: const Color(0xFF1976D2),
-                    onTap: () => _push(context, const PandalMapScreen()),
+                    icon: Icons.favorite,
+                    label: 'ఇష్టమైన హారతులు',
+                    iconColor: AppColors.maroon,
+                    onTap: () => _push(context, const FavoritesScreen()),
                   ),
                 ]),
               ),
