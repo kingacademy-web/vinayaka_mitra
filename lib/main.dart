@@ -1,6 +1,3 @@
-import 'dart:ui';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -12,36 +9,27 @@ import 'providers/pooja_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/home/home_screen.dart';
 import 'services/firebase_service.dart';
-import 'services/notification_service.dart';
 import 'services/offline_cache_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set preferred orientations
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-
-  // 1. Initialize Hive Offline Local Box Storage
-  await OfflineCacheService().init();
-
-  // 2. Initialize Firebase (graceful handling if offline or awaiting config)
+  // Set preferred orientations safely
   try {
-    await Firebase.initializeApp();
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
-    await FirebaseService().signInAnonymously();
-    await NotificationService().init();
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  } catch (_) {}
+
+  // Initialize Hive Offline Local Storage safely
+  try {
+    await OfflineCacheService().init();
   } catch (e) {
-    debugPrint('Firebase not initialized in local standalone mode: $e');
+    debugPrint('Offline cache initialization error: $e');
   }
 
-  final firebaseService = FirebaseService();
+  final dataService = FirebaseService();
 
   runApp(
     MultiProvider(
@@ -49,10 +37,10 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(
-          create: (_) => HarathiProvider(firebaseService)..load(),
+          create: (_) => HarathiProvider(dataService)..load(),
         ),
         ChangeNotifierProvider(
-          create: (_) => PoojaProvider(firebaseService)..load(),
+          create: (_) => PoojaProvider(dataService)..load(),
         ),
       ],
       child: const VinayakaMitraApp(),

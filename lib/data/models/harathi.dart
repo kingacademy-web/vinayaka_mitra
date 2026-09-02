@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Harathi {
   final String id;
   final String titleTe;
@@ -24,22 +22,6 @@ class Harathi {
     this.audioUrl,
     this.isPremium = false,
   });
-
-  factory Harathi.fromFirestore(DocumentSnapshot doc) {
-    final d = doc.data() as Map<String, dynamic>? ?? {};
-    return Harathi(
-      id: doc.id,
-      titleTe: d['titleTe'] ?? '',
-      titleEn: d['titleEn'] ?? '',
-      category: d['category'] ?? 'ganesh',
-      lyricsTelugu: d['lyricsTelugu'] ?? '',
-      lyricsEnglish: d['lyricsEnglish'] ?? '',
-      meaning: d['meaning'] ?? '',
-      imageUrl: d['imageUrl'],
-      audioUrl: d['audioUrl'],
-      isPremium: d['isPremium'] ?? false,
-    );
-  }
 
   factory Harathi.fromMap(Map<String, dynamic> m, [String? fallbackId]) {
     return Harathi(

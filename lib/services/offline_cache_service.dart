@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../data/models/harathi.dart';
 
@@ -12,83 +13,123 @@ class OfflineCacheService {
   static const String _poojaChecklistBox = 'pooja_checklist_box';
 
   Future<void> init() async {
-    await Hive.initFlutter();
-    await Hive.openBox(_harathiBox);
-    await Hive.openBox(_favoritesBox);
-    await Hive.openBox(_bookmarksBox);
-    await Hive.openBox(_poojaChecklistBox);
+    try {
+      await Hive.initFlutter();
+      if (!Hive.isBoxOpen(_harathiBox)) await Hive.openBox(_harathiBox);
+      if (!Hive.isBoxOpen(_favoritesBox)) await Hive.openBox(_favoritesBox);
+      if (!Hive.isBoxOpen(_bookmarksBox)) await Hive.openBox(_bookmarksBox);
+      if (!Hive.isBoxOpen(_poojaChecklistBox)) await Hive.openBox(_poojaChecklistBox);
+    } catch (e) {
+      debugPrint('Hive initialization handled gracefully: $e');
+    }
   }
 
   // --- Harathi Caching ---
   Future<void> cacheHarathis(List<Harathi> list) async {
-    final box = Hive.box(_harathiBox);
-    for (final h in list) {
-      await box.put(h.id, h.toMap());
-    }
+    try {
+      if (!Hive.isBoxOpen(_harathiBox)) await Hive.openBox(_harathiBox);
+      final box = Hive.box(_harathiBox);
+      for (final h in list) {
+        await box.put(h.id, h.toMap());
+      }
+    } catch (_) {}
   }
 
   List<Harathi> getCachedHarathis() {
-    final box = Hive.box(_harathiBox);
-    final list = <Harathi>[];
-    for (final value in box.values) {
-      try {
-        final map = Map<String, dynamic>.from(value as Map);
-        list.add(Harathi.fromMap(map));
-      } catch (_) {}
+    try {
+      if (!Hive.isBoxOpen(_harathiBox)) return [];
+      final box = Hive.box(_harathiBox);
+      final list = <Harathi>[];
+      for (final value in box.values) {
+        try {
+          final map = Map<String, dynamic>.from(value as Map);
+          list.add(Harathi.fromMap(map));
+        } catch (_) {}
+      }
+      return list;
+    } catch (_) {
+      return [];
     }
-    return list;
   }
 
   // --- Favorites ---
   Future<void> toggleFavorite(String id) async {
-    final box = Hive.box(_favoritesBox);
-    final current = box.get(id, defaultValue: false) as bool;
-    await box.put(id, !current);
+    try {
+      if (!Hive.isBoxOpen(_favoritesBox)) await Hive.openBox(_favoritesBox);
+      final box = Hive.box(_favoritesBox);
+      final current = box.get(id, defaultValue: false) as bool;
+      await box.put(id, !current);
+    } catch (_) {}
   }
 
   bool isFavorite(String id) {
-    if (!Hive.isBoxOpen(_favoritesBox)) return false;
-    final box = Hive.box(_favoritesBox);
-    return (box.get(id, defaultValue: false) as bool?) ?? false;
+    try {
+      if (!Hive.isBoxOpen(_favoritesBox)) return false;
+      final box = Hive.box(_favoritesBox);
+      return (box.get(id, defaultValue: false) as bool?) ?? false;
+    } catch (_) {
+      return false;
+    }
   }
 
   List<String> getAllFavorites() {
-    if (!Hive.isBoxOpen(_favoritesBox)) return [];
-    final box = Hive.box(_favoritesBox);
-    return box.keys
-        .where((k) => box.get(k, defaultValue: false) == true)
-        .map((k) => k.toString())
-        .toList();
+    try {
+      if (!Hive.isBoxOpen(_favoritesBox)) return [];
+      final box = Hive.box(_favoritesBox);
+      return box.keys
+          .where((k) => box.get(k, defaultValue: false) == true)
+          .map((k) => k.toString())
+          .toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   // --- Bookmarks ---
   Future<void> toggleBookmark(String id) async {
-    final box = Hive.box(_bookmarksBox);
-    final current = box.get(id, defaultValue: false) as bool;
-    await box.put(id, !current);
+    try {
+      if (!Hive.isBoxOpen(_bookmarksBox)) await Hive.openBox(_bookmarksBox);
+      final box = Hive.box(_bookmarksBox);
+      final current = box.get(id, defaultValue: false) as bool;
+      await box.put(id, !current);
+    } catch (_) {}
   }
 
   bool isBookmarked(String id) {
-    if (!Hive.isBoxOpen(_bookmarksBox)) return false;
-    final box = Hive.box(_bookmarksBox);
-    return (box.get(id, defaultValue: false) as bool?) ?? false;
+    try {
+      if (!Hive.isBoxOpen(_bookmarksBox)) return false;
+      final box = Hive.box(_bookmarksBox);
+      return (box.get(id, defaultValue: false) as bool?) ?? false;
+    } catch (_) {
+      return false;
+    }
   }
 
   // --- Pooja Step Checklist ---
   Future<void> setPoojaStepCompleted(int stepNumber, bool completed) async {
-    final box = Hive.box(_poojaChecklistBox);
-    await box.put(stepNumber.toString(), completed);
+    try {
+      if (!Hive.isBoxOpen(_poojaChecklistBox)) await Hive.openBox(_poojaChecklistBox);
+      final box = Hive.box(_poojaChecklistBox);
+      await box.put(stepNumber.toString(), completed);
+    } catch (_) {}
   }
 
   bool isPoojaStepCompleted(int stepNumber) {
-    if (!Hive.isBoxOpen(_poojaChecklistBox)) return false;
-    final box = Hive.box(_poojaChecklistBox);
-    return (box.get(stepNumber.toString(), defaultValue: false) as bool?) ?? false;
+    try {
+      if (!Hive.isBoxOpen(_poojaChecklistBox)) return false;
+      final box = Hive.box(_poojaChecklistBox);
+      return (box.get(stepNumber.toString(), defaultValue: false) as bool?) ?? false;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<void> resetPoojaChecklist() async {
-    final box = Hive.box(_poojaChecklistBox);
-    await box.clear();
+    try {
+      if (!Hive.isBoxOpen(_poojaChecklistBox)) await Hive.openBox(_poojaChecklistBox);
+      final box = Hive.box(_poojaChecklistBox);
+      await box.clear();
+    } catch (_) {}
   }
 
   int getCompletedPoojaStepsCount(int totalSteps) {
