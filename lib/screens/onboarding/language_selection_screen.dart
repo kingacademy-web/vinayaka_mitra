@@ -13,25 +13,41 @@ class LanguageSelectionScreen extends StatefulWidget {
   State<LanguageSelectionScreen> createState() => _LanguageSelectionScreenState();
 }
 
+class _LangItem {
+  final String code;
+  final String name;
+  final String nativeName;
+  final String subtitle;
+  final String flag;
+
+  const _LangItem({
+    required this.code,
+    required this.name,
+    required this.nativeName,
+    required this.subtitle,
+    required this.flag,
+  });
+}
+
 class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   late String _selectedCode;
 
-  final List<({String code, String name, String nativeName, String subtitle, String flag})> _languages = [
-    (
+  final List<_LangItem> _languages = const [
+    _LangItem(
       code: 'te',
       name: 'Telugu',
       nativeName: 'తెలుగు',
       subtitle: 'సంపూర్ణ పూజా విధానం, హారతులు & మిత్ర మండలి నిర్వహణ',
       flag: '🇮🇳',
     ),
-    (
+    _LangItem(
       code: 'hi',
       name: 'Hindi',
       nativeName: 'हिन्दी',
       subtitle: 'षोडशोपचार पूजा, आरती संग्रह एवं गणेश उत्सव समिति',
       flag: '🇮🇳',
     ),
-    (
+    _LangItem(
       code: 'en',
       name: 'English',
       nativeName: 'English',

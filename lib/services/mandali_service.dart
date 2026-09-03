@@ -92,7 +92,7 @@ class MandaliService extends ChangeNotifier {
     }
   }
 
-  void _seedDefaultEvents() {
+  Future<void> _seedDefaultEvents() async {
     final defaults = [
       FestivalEvent(
         id: 'event_1',
@@ -136,9 +136,15 @@ class MandaliService extends ChangeNotifier {
       ),
     ];
 
-    for (final ev in defaults) {
-      addEvent(ev);
-    }
+    try {
+      final box = Hive.box(_scheduleBoxName);
+      for (final ev in defaults) {
+        await box.put(ev.id, ev.toMap());
+        _events.add(ev);
+      }
+      _events.sort((a, b) => a.dayNumber.compareTo(b.dayNumber));
+      notifyListeners();
+    } catch (_) {}
   }
 
   // --- CRUD Operations ---
