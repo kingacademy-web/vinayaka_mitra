@@ -41,8 +41,15 @@ jobs:
             echo "::group::Build Error Details"
             tail -n 120 build_log.txt
             echo "::endgroup::"
-            ERROR_SUMMARY=$(tail -n 35 build_log.txt | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g')
-            echo "::error title=FlutterBuildFailure::$ERROR_SUMMARY"
+            grep -B 3 -A 25 "What went wrong:" build_log.txt | while IFS= read -r line; do
+              echo "::error title=GradleFailure::$line"
+            done
+            grep -B 3 -A 20 "FAILURE:" build_log.txt | while IFS= read -r line; do
+              echo "::error title=BuildFailure::$line"
+            done
+            tail -n 25 build_log.txt | while IFS= read -r line; do
+              echo "::warning title=TailLog::$line"
+            done
             exit $EXIT_CODE
           fi
 
