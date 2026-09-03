@@ -34,13 +34,15 @@ jobs:
 
       - name: Build Android Release APK
         run: |
-          flutter build apk --release --no-tree-shake-icons --verbose 2>&1 | tee build_log.txt
-          EXIT_CODE=${PIPESTATUS[0]}
+          set +e
+          flutter build apk --release --no-tree-shake-icons --verbose > build_log.txt 2>&1
+          EXIT_CODE=$?
           if [ $EXIT_CODE -ne 0 ]; then
-            echo "## ❌ Build Failure Summary" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            tail -n 60 build_log.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "::group::Build Error Details"
+            tail -n 120 build_log.txt
+            echo "::endgroup::"
+            ERROR_SUMMARY=$(tail -n 35 build_log.txt | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g')
+            echo "::error title=FlutterBuildFailure::$ERROR_SUMMARY"
             exit $EXIT_CODE
           fi
 
