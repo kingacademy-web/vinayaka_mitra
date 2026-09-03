@@ -30,7 +30,12 @@ jobs:
         run: flutter pub get
 
       - name: Analyze Project Code
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos || true
+        run: |
+          flutter analyze --no-fatal-warnings --no-fatal-infos > analyze_log.txt 2>&1 || true
+          cat analyze_log.txt
+          grep -E "(error •|warning •)" analyze_log.txt | while IFS= read -r line; do
+            echo "::error title=DartIssue::$line"
+          done
 
       - name: Build Android Release APK
         run: |
@@ -38,17 +43,14 @@ jobs:
           flutter build apk --release --no-tree-shake-icons --verbose > build_log.txt 2>&1
           EXIT_CODE=$?
           if [ $EXIT_CODE -ne 0 ]; then
-            echo "::group::Build Error Details"
-            tail -n 120 build_log.txt
-            echo "::endgroup::"
-            grep -B 3 -A 25 "What went wrong:" build_log.txt | while IFS= read -r line; do
+            grep -B 35 -A 5 "Target kernel_snapshot_program failed" build_log.txt | while IFS= read -r line; do
+              echo "::error title=KernelFailure::$line"
+            done
+            grep -B 15 -A 10 "compileFlutterBuildRelease" build_log.txt | while IFS= read -r line; do
+              echo "::error title=CompileFlutter::$line"
+            done
+            grep -B 2 -A 15 "What went wrong:" build_log.txt | while IFS= read -r line; do
               echo "::error title=GradleFailure::$line"
-            done
-            grep -B 3 -A 20 "FAILURE:" build_log.txt | while IFS= read -r line; do
-              echo "::error title=BuildFailure::$line"
-            done
-            tail -n 25 build_log.txt | while IFS= read -r line; do
-              echo "::warning title=TailLog::$line"
             done
             exit $EXIT_CODE
           fi
