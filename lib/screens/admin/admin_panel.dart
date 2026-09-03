@@ -21,7 +21,6 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
   final _notifTitleCtrl = TextEditingController();
   final _notifBodyCtrl = TextEditingController();
 
-  bool _isAdmin = false;
   bool _checkingAdmin = true;
 
   @override
@@ -40,9 +39,8 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
   }
 
   Future<void> _verifyAdmin() async {
-    final admin = await _service.checkIsAdmin();
+    await _service.checkIsAdmin();
     setState(() {
-      _isAdmin = admin;
       _checkingAdmin = false;
     });
   }

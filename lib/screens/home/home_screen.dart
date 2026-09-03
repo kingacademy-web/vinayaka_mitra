@@ -34,6 +34,7 @@ class HomeScreen extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final panchangam = DevotionalDateUtils.getTodaysPanchangam();
     final daysLeft = DevotionalDateUtils.getDaysUntilGaneshChaturthi();
+    final todayDateStr = DevotionalDateUtils.formatTeluguDate(DateTime.now());
 
     return Scaffold(
       body: SafeArea(
@@ -210,10 +211,10 @@ class HomeScreen extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               lang.currentLanguage == 'hi'
-                                  ? 'दैनिक पंचांग (${panchangam.dateFormatted})'
+                                  ? 'दैनिक पंचांग ($todayDateStr)'
                                   : lang.currentLanguage == 'en'
-                                      ? 'Daily Panchangam (${panchangam.dateFormatted})'
-                                      : 'నేటి పంచాంగం (${panchangam.dateFormatted})',
+                                      ? 'Daily Panchangam ($todayDateStr)'
+                                      : 'నేటి పంచాంగం ($todayDateStr)',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 14,
@@ -228,15 +229,15 @@ class HomeScreen extends StatelessWidget {
                           children: [
                             _PanchangamItem(
                               title: lang.currentLanguage == 'hi' ? 'तिथि' : lang.currentLanguage == 'en' ? 'Tithi' : 'తిథి',
-                              value: panchangam.tithi,
+                              value: panchangam['tithi'] ?? 'చవితి',
                             ),
                             _PanchangamItem(
                               title: lang.currentLanguage == 'hi' ? 'नक्षत्र' : lang.currentLanguage == 'en' ? 'Nakshatra' : 'నక్షత్రం',
-                              value: panchangam.nakshatram,
+                              value: panchangam['nakshatram'] ?? 'హస్త',
                             ),
                             _PanchangamItem(
                               title: lang.currentLanguage == 'hi' ? 'अभिजीत मुहूर्त' : lang.currentLanguage == 'en' ? 'Muhurtham' : 'ముహూర్తం',
-                              value: panchangam.abhijitMuhurtham,
+                              value: panchangam['muhurtham'] ?? '11:45 AM',
                             ),
                           ],
                         ),
